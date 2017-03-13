@@ -16,12 +16,16 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from blogs.views import index, blogs, user_blog, post_detail
+from blogs.views import index, blogs, user_blog, post_detail, new_post, login, logout, signup
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', index, name='index'),
     url(r'^blogs/$', blogs, name='blogs'),
     url(r'^blogs/(?P<username>[0-9a-zA-Z_-]+)/$', user_blog, name='user_blog'),
-    url(r'^blogs/(?P<username>[0-9a-zA-Z_-]+)/(?P<post_id>[0-9]+)/$', post_detail, name='post_detail')
+    url(r'^blogs/(?P<username>[0-9a-zA-Z_-]+)/(?P<post_id>[0-9]+)/$', post_detail, name='post_detail'),
+    url(r'^new-post/$', new_post, name='new_post'),
+    url(r'^login/$', login, name='login'),
+    url(r'^logout/$', logout, name='logout'),
+    url(r'^signup/$', signup, name='signup')
 ]

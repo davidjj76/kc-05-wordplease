@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render, get_list_or_404
@@ -77,3 +78,20 @@ def post_detail(request, username, post_id):
         raise Http404("No post found.")
     else:
         return render(request, 'blogs/detail.html', { 'post': posts[0] })
+
+
+@login_required(login_url='/login/')
+def new_post(request):
+    return render(request, 'blogs/new_post.html')
+
+
+def login(request):
+    return render(request, 'login.html')
+
+
+def logout(request):
+    return render(request, 'logout.html')
+
+
+def signup(request):
+    return render(request, 'signup.html')

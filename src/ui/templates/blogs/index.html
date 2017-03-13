@@ -1,49 +1,48 @@
-<main id="main-content" class="main-content-area">
-    <section class="main-content-container">
-        {% if blog %}
-            <h2 class="section-title">{{ blog.name }}</h2>
-        {% else %}
-            <h2 class="section-title">LATEST POSTS</h2>
-        {% endif %}
-        <div class="articles-list">
+{% extends 'base.html' %}
+{% block title %}
+    Wordplease -
+    {% if blog %}
+        {{ blog.name }}
+    {% else %}
+        Latest posts
+    {% endif %}
+{% endblock %}
+{% block content %}
+    {% if blog %}
+        <h2>{{ blog.name | upper }}</h2>
+    {% else %}
+        <h2>LATEST POSTS</h2>
+    {% endif %}
+    <table width="100%" border="1" cellpadding="10" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Blog</th>
+                <th>Title</th>
+                <th>Image</th>
+                <th>Summary</th>
+                <th>Status</th>
+                <th>Categories</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for post in posts %}
-                <article class="article">
-                    <header class="article-header">
+                <tr>
+                    <td>
+                        <a href="{% url 'user_blog' post.blog.owner.username %}" title="{{ post.blog.name }}">{{ post.blog.name }}</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'post_detail' post.blog.owner.username post.id %}" title="{{ post.title }}">{{ post.title }}</a>
+                    </td>
+                    <td>
                         {% if post.media_url %}
-                            <img class="picture" src="{{ post.media_url }}">
+                            <img src="{{ post.media_url }}" alt="{{ post.title }}">
                         {% endif %}
-                        {% for category in post.categories.all %}
-                            <a href="#" class="article-tag">{{ category.name }}</a>
-                        {% endfor %}
-                    </header>
-                    <div class="article-content">
-                        <h6 class="article-title"><a href="{% url 'post_detail' post.blog.owner.username post.id %}">{{ post.title }}</a></h6>
-                        <p class="article-text">{{ post.summary }} […]</p>
-                        <a href="{% url 'post_detail' post.blog.owner.username post.id %}" class="continue-link">Read more...</a>
-                    </div>
-                    <footer class="article-footer">
-                        <div class="article-author">
-                            <picture>
-                                <source srcset="/dist/img/user-01-60px.jpg 60w">
-                                <img class="photo" srcset="/dist/img/user-01.jpg">
-                            </picture>
-                            <div class="author-wrapper">
-                                <a href="{% url 'user_blog' post.blog.owner.username %}">{{ post.blog.owner.first_name }} {{ post.blog.owner.last_name }} ({{ post.blog.owner.username }})</a>
-                                <time class="article-date" datetime="{{ post.published_at }}">{{ post.published_at }}</time>
-                            </div>
-                        </div>
-                        <div class="article-actions">
-                            <button type="button" class="button-like" title="Me gusta" data-article-id="1">
-                                <div class="button-wrapper">
-                                    <i class="fa fa-thumbs-o-up fa-2x"></i>
-                                    <span class="likes"></span>
-                                </div>
-                            </button>
-                            <a title="Ir a los comentarios" class="link-comments" href="detail.html#article-comments"><span>(24)</span><i class="fa fa-commenting-o fa-2x"></i></a>
-                        </div>
-                    </footer>
-                </article>
+                    </td>
+                    <td>{{ post.summary }}</td>
+                    <td>{{ post.status }}</td>
+                    <td>{{ post.tagged_with }}</td>
+                </tr>
             {% endfor %}
-        </div>
-    </section>
-</main>
+        </tbody>
+    </table>
+{% endblock %}

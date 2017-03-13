@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Wordplease{% endblock %}</title>
+</head>
+<body>
+    <h1>Wordplease</h1>
+    <hr>
+    <a href="{% url 'index' %}" title="Home">Home</a>
+    |
+    <a href="{% url 'blogs' %}" title="Blogs">Blogs</a>
+    {% if user.blog %}
+        |
+        <a href="{% url 'user_blog' user.username %}" title="{{ user.blog.name }}">My Blog</a>
+    {% endif %}
+    {% if user.is_authenticated %}
+        |
+        <a href="{% url 'new_post' %}" title="New post">New Post</a>
+        |
+        <a href="{% url 'logout' %}" title="Logout from Wordplease">Logout <em>({{ user.username }})</em></a>
+    {% else %}
+        |
+        <a href="{% url 'signup' %}" title="Signup in Wordplease">Signup</a>
+        |
+        <a href="{% url 'login' %}" title="Login into Wordplease">Login</a>
+    {% endif %}
+    <hr>
+    {% block content %}{% endblock %}
+    <hr>
+    Wordplease &copy; All rights reserved.
+</body>
+</html>

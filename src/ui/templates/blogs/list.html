@@ -1,5 +1,24 @@
-<ul>
-    {% for blog in blogs %}
-    <li><a href="{% url 'user_blog' blog.owner.username %}">{{ blog.name }} {{ blog.owner.username }}</a></li>
-    {% endfor %}
-</ul>
+{% extends 'base.html' %}
+{% block content %}
+    <h2>USER'S BLOGS</h2>
+    <table width="100%" border="1" cellpadding="10" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Blog</th>
+                <th>Owner</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for blog in blogs %}
+                <tr>
+                    <td>
+                        <a href="{% url 'user_blog' blog.owner.username %}" title="{{ blog.name }}">{{ blog.name }}</a>
+                    </td>
+                    <td>
+                        {{ blog.owner.first_name }} {{ blog.owner.last_name }} <em>({{ blog.owner.username }})</em>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
