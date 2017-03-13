@@ -11,7 +11,7 @@ class Blog(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ["owner"]
+        ordering = ["owner__username"]
 
     def __str__(self):
         return self.name

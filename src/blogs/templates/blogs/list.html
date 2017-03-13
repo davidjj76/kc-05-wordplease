@@ -1,0 +1,5 @@
+<ul>
+    {% for blog in blogs %}
+    <li><a href="{% url 'user_blog' blog.owner.username %}">{{ blog.name }} {{ blog.owner.username }}</a></li>
+    {% endfor %}
+</ul>
