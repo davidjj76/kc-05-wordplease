@@ -4,18 +4,26 @@
     <table width="100%" border="1" cellpadding="10" cellspacing="0">
         <thead>
             <tr>
-                <th>Blog</th>
                 <th>Owner</th>
+                <th>Full name</th>
+                <th>Email</th>
+                <th>Blog</th>
             </tr>
         </thead>
         <tbody>
             {% for blog in blogs %}
                 <tr>
                     <td>
-                        <a href="{% url 'user_blog' blog.owner.username %}" title="{{ blog.name }}">{{ blog.name }}</a>
+                        <em>{{ blog.username }}</em>
                     </td>
                     <td>
-                        {{ blog.owner.first_name }} {{ blog.owner.last_name }} <em>({{ blog.owner.username }})</em>
+                        {{ blog.first_name }} {{ blog.last_name }}
+                    </td>
+                    <td>
+                        {{ blog.email }}
+                    </td>
+                    <td>
+                        <a href="{% url 'user_blog' blog.username %}" title="Go to {{ blog.username }}'s blog">View blog</a>
                     </td>
                 </tr>
             {% endfor %}

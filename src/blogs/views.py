@@ -1,10 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render, get_list_or_404
 from django.utils import timezone
 
-from blogs.models import Blog, Post
+from blogs.models import Post
 
 
 def published_posts(user):
@@ -15,7 +16,7 @@ def published_posts(user):
     if user.is_authenticated():
         if not user.is_superuser:
             # Can see his posts and published posts from other users (published before now)
-            return (Q(blog__owner__username=user.username) | Q(published_at__lte=timezone.now()))
+            return (Q(owner__username=user.username) | Q(published_at__lte=timezone.now()))
     else:
         # Only can see published posts (published before now)
         return (Q(published_at__lte=timezone.now()))
@@ -39,7 +40,7 @@ def blogs(request):
     :param request: HttpRequest object
     :return: HttpResponse object
     """
-    blogs = get_list_or_404(Blog.objects.select_related())
+    blogs = get_list_or_404(User.objects.select_related())
     return render(request, 'blogs/list.html', { 'blogs': blogs })
 
 
@@ -50,14 +51,14 @@ def user_blog(request, username):
     :return: HttpResponse object
     """
     posts = Post.objects.select_related()\
-        .filter(blog__owner__username=username)\
+        .filter(owner__username=username)\
         .filter(published_posts(request.user))
 
     if len(posts) == 0:
         raise Http404("No blog/posts found.")
     else:
         context = {
-            'blog': posts[0].blog,
+            'blog': posts[0].owner,
             'posts': posts
         }
         return render(request, 'blogs/index.html', context)
@@ -70,7 +71,7 @@ def post_detail(request, username, post_id):
     :return: HttpResponse object
     """
     posts = Post.objects.select_related()\
-        .filter(blog__owner__username=username)\
+        .filter(owner__username=username)\
         .filter(id=post_id)\
         .filter(published_posts(request.user))
 

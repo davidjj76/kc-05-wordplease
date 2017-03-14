@@ -1,13 +1,7 @@
 from django.contrib import admin
 from django.utils import timezone
 
-from blogs.models import Blog, Category, Post
-
-
-@admin.register(Blog)
-class BlogAdmin(admin.ModelAdmin):
-
-    list_display = ('name', 'owner')
+from blogs.models import Category, Post
 
 
 @admin.register(Category)
@@ -38,11 +32,5 @@ class StatusListFilter(admin.SimpleListFilter):
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
 
-    list_display = ('title', 'blog', 'get_owner', 'published_at', 'status', 'tagged_with')
-    list_filter = ('blog', 'blog__owner', 'categories', StatusListFilter)
-
-    def get_owner(self, obj):
-        return obj.blog.owner
-
-    get_owner.short_description = 'Owner'
-    get_owner.admin_order_field = 'blog__owner'
+    list_display = ('title', 'owner', 'published_at', 'status', 'tagged_with')
+    list_filter = ('owner', 'categories', StatusListFilter)
