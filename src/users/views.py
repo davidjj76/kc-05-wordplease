@@ -1,29 +1,45 @@
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.shortcuts import render, redirect
+from django.views import View
+
+from users.forms import LoginForm
 
 
-def login(request):
-    """
-    Logs in a user
-    :param request: HttpRequest object
-    :return:  HttpResponse object
-    """
-    context = dict()
-    if request.method == 'POST':
-        username = request.POST.get('usr')
-        password = request.POST.get('pwd')
-        user = authenticate(username=username, password=password)
+class LoginView(View):
 
-        if user:
-            # Authenticated user
-            django_login(request, user)
-            url = request.GET.get('next', 'user_blog')
-            return redirect(url, username=username)
-        else:
-            # Non authenticated user
-            context['error'] = "Wrong username / password"
+    def get(self, request):
+        """
+        Shows login form
+        :param request: HttpRequest object
+        :return:  HttpResponse object
+        """
+        return render(request, 'login.html', { 'form': LoginForm() })
 
-    return render(request, 'login.html', context)
+    def post(self, request):
+        """
+        Logs in a user
+        :param request: HttpRequest object
+        :return:  HttpResponse object
+        """
+        form = LoginForm(request.POST)
+        context = dict()
+
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+
+            if user:
+                # Authenticated user
+                django_login(request, user)
+                url = request.GET.get('next', 'user_blog')
+                return redirect(url, username=username)
+            else:
+                # Non authenticated user
+                context['error'] = "Wrong username / password"
+
+        context['form'] = form
+        return render(request, 'login.html', context)
 
 
 def logout(request):

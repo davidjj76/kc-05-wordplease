@@ -4,7 +4,10 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import render, get_list_or_404, redirect
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views import View
 
+from blogs.forms import PostForm
 from blogs.models import Post
 
 
@@ -87,6 +90,40 @@ def post_detail(request, username, post_id):
         return render(request, 'blogs/detail.html', { 'post': posts[0] })
 
 
-@login_required(login_url='/login/')
-def new_post(request):
-    return render(request, 'blogs/new_post.html')
+
+class NewPostView(View):
+
+    @method_decorator(login_required(login_url='/login/'))
+    def get(self, request):
+        """
+        Shows new post form
+        :param request: HttpRequest object
+        :return:  HttpResponse object
+        """
+        form = PostForm()
+        return render(request, 'blogs/new_post.html', { 'form': form })
+
+    @method_decorator(login_required(login_url='/login/'))
+    def post(self, request):
+        """
+        Create a new post
+        :param request: HttpRequest object
+        :return:  HttpResponse object
+        """
+        new_post = Post(owner=request.user)
+        form = PostForm(request.POST, instance=new_post)
+        context = dict()
+
+        if form.is_valid():
+            post = form.save()
+            # Redirect to post detail
+            return redirect('post_detail', username=post.owner.username, post_id=post.id)
+        else:
+            context['error'] = "Error submitting post"
+
+        context['form'] = form
+        return render(request, 'blogs/new_post.html', context)
+
+# @login_required(login_url='/login/')
+# def new_post(request):
+#     return render(request, 'blogs/new_post.html')

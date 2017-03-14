@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %} Wordplease - User's blogs {% endblock %}
 {% block content %}
     <h2>USER'S BLOGS</h2>
     <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -23,7 +24,7 @@
                         {{ blog.email }}
                     </td>
                     <td>
-                        <a href="{% url 'user_blog' blog.username %}" title="Go to {{ blog.username }}'s blog">View blog</a>
+                        <a href="{% url 'user_blog' blog.username %}" title="Go to {{ blog.username }}'s blog">{{ blog.username }}'s blog</a>
                     </td>
                 </tr>
             {% endfor %}

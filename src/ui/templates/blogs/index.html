@@ -2,7 +2,7 @@
 {% block title %}
     Wordplease -
     {% if blog %}
-        {{ blog.username }}
+        {{ blog.username }}'s blog
     {% else %}
         Latest posts
     {% endif %}
@@ -28,7 +28,7 @@
             {% for post in posts %}
                 <tr>
                     <td>
-                        <a href="{% url 'user_blog' post.owner.username %}" title="Go to {{ post.owner.username }}'s blog">View blog</a>
+                        <a href="{% url 'user_blog' post.owner.username %}" title="Go to {{ post.owner.username }}'s blog">{{ post.owner.username }}'s blog</a>
                     </td>
                     <td>
                         <a href="{% url 'post_detail' post.owner.username post.id %}" title="Read more...">{{ post.title }}</a>
@@ -39,7 +39,11 @@
                         {% endif %}
                     </td>
                     <td>{{ post.summary }}</td>
-                    <td>{{ post.status }}</td>
+                    {% if post.status == "Draft" %}
+                        <td><strong>Will published at:</strong> {{ post.published_at }} <em>({{ post.status }})</em></td>
+                    {% else %}
+                        <td><strong>Published at:</strong> {{ post.published_at }}</td>
+                    {% endif %}
                     <td>{{ post.tagged_with }}</td>
                 </tr>
             {% endfor %}
