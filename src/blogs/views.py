@@ -119,7 +119,7 @@ class NewPostView(View):
             # Redirect to post detail
             return redirect('post_detail', username=post.owner.username, post_id=post.id)
         else:
-            context['error'] = "Error submitting post"
+            context['error'] = "Error submitting new post"
 
         context['form'] = form
         return render(request, 'blogs/new_post.html', context)

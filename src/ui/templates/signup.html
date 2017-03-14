@@ -5,20 +5,9 @@
 
     <div style="color:red">{{ error }}</div>
 
-    <form method="post">
+    <form method="post" novalidate>
         {% csrf_token %}
-        <div>
-            <strong>Username: </strong>
-            <input type="text" id="username" name="usr">
-        </div>
-        <div>
-            <strong>Password: </strong>
-            <input type="password" id="password" name="pwd">
-        </div>
-        <div>
-            <strong>Repeat password: </strong>
-            <input type="password" id="repeat_password" name="rpt_pwd">
-        </div>
+        {{ form.as_p }}
         <div>
             <button>Signup</button>
         </div>
