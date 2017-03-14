@@ -16,15 +16,15 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from blogs.views import index, blogs, user_blog, post_detail, NewPostView
+from blogs.views import LatestPostsView, BlogsView, UserBlogView, PostDetailView, NewPostView
 from users.views import LoginView, SignupView, logout
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', index, name='index'),
-    url(r'^blogs/$', blogs, name='blogs'),
-    url(r'^blogs/(?P<username>[0-9a-zA-Z_-]+)/$', user_blog, name='user_blog'),
-    url(r'^blogs/(?P<username>[0-9a-zA-Z_-]+)/(?P<post_id>[0-9]+)/$', post_detail, name='post_detail'),
+    url(r'^$', LatestPostsView.as_view(), name='index'),
+    url(r'^blogs/$', BlogsView.as_view(), name='blogs'),
+    url(r'^blogs/(?P<username>[0-9a-zA-Z_-]+)/$', UserBlogView.as_view(), name='user_blog'),
+    url(r'^blogs/(?P<username>[0-9a-zA-Z_-]+)/(?P<pk>[0-9]+)/$', PostDetailView.as_view(), name='post_detail'),
     url(r'^new-post/$', NewPostView.as_view(), name='new_post'),
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^signup/$', SignupView.as_view(), name='signup'),

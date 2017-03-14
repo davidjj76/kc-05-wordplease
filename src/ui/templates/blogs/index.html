@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}
     Wordplease -
-    {% if blog %}
-        {{ blog.username }}'s blog
+    {% if username %}
+        {{ username }}'s blog
     {% else %}
         Latest posts
     {% endif %}
 {% endblock %}
 {% block content %}
-    {% if blog %}
-        <h2>{{ blog.username | upper }}'S BLOG</h2>
+    {% if username %}
+        <h2>{{ username | upper }}'S BLOG</h2>
     {% else %}
         <h2>LATEST POSTS</h2>
     {% endif %}
@@ -42,7 +42,7 @@
                     {% if post.status == "Draft" %}
                         <td><strong>Will published at:</strong> {{ post.published_at }} <em>({{ post.status }})</em></td>
                     {% else %}
-                        <td><strong>Published at:</strong> {{ post.published_at }}</td>
+                        <td><strong>Was published at:</strong> {{ post.published_at }}</td>
                     {% endif %}
                     <td>{{ post.tagged_with }}</td>
                 </tr>

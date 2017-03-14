@@ -6,6 +6,8 @@ from django.shortcuts import render, get_list_or_404, redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.generic import DetailView
+from django.views.generic import ListView
 
 from blogs.forms import PostForm
 from blogs.models import Post
@@ -27,68 +29,60 @@ def published_posts(user):
     return Q()
 
 
-def index(request):
-    """
-    Get latest posts
-    :param request: HttpRequest object
-    :return: HttpResponse object
-    """
-    posts = get_list_or_404(Post.objects.select_related(), published_posts(request.user))
-    return render(request, 'blogs/index.html', {'posts': posts})
+class LatestPostsView(ListView):
+
+    template_name = 'blogs/index.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.select_related()\
+            .filter(published_posts(self.request.user))
 
 
-@user_passes_test(lambda u: u.is_superuser, login_url='/login/')
-def blogs(request):
-    """
-    Get blogs list (only for superusers)
-    :param request: HttpRequest object
-    :return: HttpResponse object
-    """
-    blogs = get_list_or_404(User.objects.select_related())
-    return render(request, 'blogs/list.html', { 'blogs': blogs })
+@method_decorator(user_passes_test(lambda u: u.is_superuser, login_url='/login/'), name='dispatch')
+class BlogsView(ListView):
+
+    template_name = 'blogs/list.html'
+    context_object_name = 'blogs'
+    queryset = User.objects.select_related()
 
 
-def user_blog(request, username):
-    """
-    Get user posts
-    :param request: HttpRequest object
-    :return: HttpResponse object
-    """
-    posts = Post.objects.select_related()\
-        .filter(owner__username=username)\
-        .filter(published_posts(request.user))
+class UserBlogView(ListView):
 
-    if len(posts) == 0:
-        if request.user.username == username:
-            # If user is owner redirect to new post
-            return redirect('new_post')
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.select_related()\
+            .filter(owner__username=self.kwargs.get('username'))\
+            .filter(published_posts(self.request.user))
+
+    def get_context_data(self, **kwargs):
+        context = super(UserBlogView, self).get_context_data(**kwargs)
+        context['username'] = self.kwargs.get('username')
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if len(self.object_list) == 0:
+            if self.request.user.username == self.kwargs.get('username'):
+                return redirect('new_post')
+            else:
+                raise Http404("No blog/posts found.")
+        return render(self.request, 'blogs/index.html', context)
+
+
+class PostDetailView(DetailView):
+
+    def get_queryset(self):
+        return Post.objects.select_related() \
+            .filter(owner__username=self.kwargs.get('username')) \
+            .filter(id=self.kwargs.get('pk')) \
+            .filter(published_posts(self.request.user))
+
+    def render_to_response(self, context, **response_kwargs):
+        if not self.object:
+            raise Http404("No post found.")
         else:
-            # 404
-            raise Http404("No blog/posts found.")
-    else:
-        context = {
-            'blog': posts[0].owner,
-            'posts': posts
-        }
-        return render(request, 'blogs/index.html', context)
-
-
-def post_detail(request, username, post_id):
-    """
-    Get post detail
-    :param request: HttpRequest object
-    :return: HttpResponse object
-    """
-    posts = Post.objects.select_related()\
-        .filter(owner__username=username)\
-        .filter(id=post_id)\
-        .filter(published_posts(request.user))
-
-    if len(posts) == 0:
-        raise Http404("No post found.")
-    else:
-        return render(request, 'blogs/detail.html', { 'post': posts[0] })
-
+            return render(self.request, 'blogs/detail.html', context)
 
 
 class NewPostView(View):
@@ -123,7 +117,3 @@ class NewPostView(View):
 
         context['form'] = form
         return render(request, 'blogs/new_post.html', context)
-
-# @login_required(login_url='/login/')
-# def new_post(request):
-#     return render(request, 'blogs/new_post.html')

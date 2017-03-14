@@ -8,7 +8,7 @@
     {% if post.status == "Draft" %}
         <span><strong>Will published at:</strong> {{ post.published_at }} <em>({{ post.status }})</em></span>
     {% else %}
-        <span><strong>Published at:</strong> {{ post.published_at }}</span>
+        <span><strong>Was published at:</strong> {{ post.published_at }}</span>
     {% endif %}
     <br>
     <span><strong>Tagged with:</strong> {{ post.tagged_with }}</span>
