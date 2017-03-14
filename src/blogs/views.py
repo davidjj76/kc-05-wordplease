@@ -100,7 +100,7 @@ class NewPostView(View):
     @method_decorator(login_required(login_url='/login/'))
     def post(self, request):
         """
-        Create a new post
+        Creates a new post
         :param request: HttpRequest object
         :return:  HttpResponse object
         """
@@ -111,7 +111,7 @@ class NewPostView(View):
         if form.is_valid():
             post = form.save()
             # Redirect to post detail
-            return redirect('post_detail', username=post.owner.username, post_id=post.id)
+            return redirect('post_detail', username=post.owner.username, pk=post.pk)
         else:
             context['error'] = "Error submitting new post"
 

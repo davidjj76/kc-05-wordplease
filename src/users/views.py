@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.views import View
 
@@ -71,16 +72,24 @@ class SignupView(View):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             repeat_password = form.cleaned_data.get('repeat_password')
+            email = form.cleaned_data.get('email')
+            first_name = form.cleaned_data.get('first_name')
+            last_name = form.cleaned_data.get('last_name')
 
             if password == repeat_password:
-                new_user = User.objects.create_user(username=username, password=password)
-
-                if new_user:
+                try:
+                    new_user = User.objects.create_user(
+                        username=username,
+                        password=password,
+                        email=email,
+                        first_name=first_name,
+                        last_name=last_name
+                    )
                     # User created
                     return login_and_redirect(request, new_user)
-                else:
+                except IntegrityError as e:
                     # User not created
-                    context['error'] = "Error submitting new user"
+                    context['error'] = e
             else:
                 context['error'] = "Password fields must match"
 
