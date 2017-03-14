@@ -1,8 +1,8 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render, get_list_or_404, redirect
 from django.utils import timezone
 
 from blogs.models import Post
@@ -34,9 +34,10 @@ def index(request):
     return render(request, 'blogs/index.html', {'posts': posts})
 
 
+@user_passes_test(lambda u: u.is_superuser, login_url='/login/')
 def blogs(request):
     """
-    Get blogs list
+    Get blogs list (only for superusers)
     :param request: HttpRequest object
     :return: HttpResponse object
     """
@@ -55,7 +56,12 @@ def user_blog(request, username):
         .filter(published_posts(request.user))
 
     if len(posts) == 0:
-        raise Http404("No blog/posts found.")
+        if request.user.username == username:
+            # If user is owner redirect to new post
+            return redirect('new_post')
+        else:
+            # 404
+            raise Http404("No blog/posts found.")
     else:
         context = {
             'blog': posts[0].owner,
@@ -84,15 +90,3 @@ def post_detail(request, username, post_id):
 @login_required(login_url='/login/')
 def new_post(request):
     return render(request, 'blogs/new_post.html')
-
-
-def login(request):
-    return render(request, 'login.html')
-
-
-def logout(request):
-    return render(request, 'logout.html')
-
-
-def signup(request):
-    return render(request, 'signup.html')

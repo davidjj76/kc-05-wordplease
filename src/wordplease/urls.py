@@ -16,7 +16,8 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from blogs.views import index, blogs, user_blog, post_detail, new_post, login, logout, signup
+from blogs.views import index, blogs, user_blog, post_detail, new_post
+from users.views import login, logout, signup
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
