@@ -17,6 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 
 from blogs.views import LatestPostsView, BlogsView, UserBlogView, PostDetailView, NewPostView
+from users.api import UsersAPI
 from users.views import LoginView, SignupView, logout
 
 urlpatterns = [
@@ -28,5 +29,8 @@ urlpatterns = [
     url(r'^new-post/$', NewPostView.as_view(), name='new_post'),
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^signup/$', SignupView.as_view(), name='signup'),
-    url(r'^logout/$', logout, name='logout')
+    url(r'^logout/$', logout, name='logout'),
+
+    # API Urls
+    url(r'^api/1.0/users/$', UsersAPI.as_view(), name='users_api')
 ]
