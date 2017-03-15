@@ -11,11 +11,9 @@
     <hr>
     <a href="{% url 'index' %}" title="Go to latest posts list">Home</a>
     |
+    <a href="{% url 'blogs' %}" title="Go to blogs list">Blogs</a>
+    |
     {% if user.is_authenticated %}
-        {% if user.is_superuser %}
-            <a href="{% url 'blogs' %}" title="Go to blogs list">Blogs</a>
-            |
-        {% endif %}
         <a href="{% url 'user_blog' user.username %}" title="Go to {{ user.username }}'s blog">My Blog</a>
         |
         <a href="{% url 'new_post' %}" title="Write new post">New Post</a>

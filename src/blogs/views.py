@@ -39,7 +39,7 @@ class LatestPostsView(ListView):
             .filter(published_posts(self.request.user))
 
 
-@method_decorator(user_passes_test(lambda u: u.is_superuser, login_url='/login/'), name='dispatch')
+# @method_decorator(user_passes_test(lambda u: u.is_superuser, login_url='/login/'), name='dispatch')
 class BlogsView(ListView):
 
     template_name = 'blogs/list.html'
