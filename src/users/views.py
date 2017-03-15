@@ -71,27 +71,23 @@ class SignupView(View):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            repeat_password = form.cleaned_data.get('repeat_password')
             email = form.cleaned_data.get('email')
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
 
-            if password == repeat_password:
-                try:
-                    new_user = User.objects.create_user(
-                        username=username,
-                        password=password,
-                        email=email,
-                        first_name=first_name,
-                        last_name=last_name
-                    )
-                    # User created
-                    return login_and_redirect(request, new_user)
-                except IntegrityError as e:
-                    # User not created
-                    context['error'] = e
+            new_user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                first_name=first_name,
+                last_name=last_name
+            )
+            if new_user:
+                # User created
+                return login_and_redirect(request, new_user)
             else:
-                context['error'] = "Password fields must match"
+                # Non created user
+                context['error'] = "Error creating user"
 
         context['form'] = form
         return render(request, 'signup.html', context)

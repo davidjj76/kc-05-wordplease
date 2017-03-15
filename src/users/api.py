@@ -30,7 +30,7 @@ class UsersAPI(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return  Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailAPI(APIView):
@@ -62,7 +62,7 @@ class UserDetailAPI(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         else:
-            return  Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         """
