@@ -26,13 +26,28 @@ class UserSerializer(serializers.Serializer):
         return instance
 
     def validate_username(self, username):
-        # Validate if username exists
-        if User.objects.filter(username=username).exists():
+        if not self.instance and User.objects.filter(username=username).exists():
+            # Creating user (no instance)
+            # Not allowed repeated username
             raise ValidationError('Username already exists')
+
+        if self.instance and self.instance.username != username and User.objects.filter(username=username).exists():
+            # Updating user (user instance)
+            # Not allowed repeated username, except his username
+            raise ValidationError('Username already exists')
+
         return username
 
     def validate_email(self, email):
-        # Validate if email exists
-        if User.objects.filter(email=email).exists():
+        if not self.instance and User.objects.filter(email=email).exists():
+            # Creating user (no instance)
+            # Not allowed repeated email
             raise ValidationError('Email already exists')
+
+        if self.instance and self.instance.email != email and User.objects.filter(email=email).exists():
+            # Updating user (user instance)
+            # Not allowed repeated email, except his email
+            raise ValidationError('Email already exists')
+
         return email
+
