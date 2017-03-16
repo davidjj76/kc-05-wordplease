@@ -34,3 +34,4 @@ class PostAdmin(admin.ModelAdmin):
 
     list_display = ('title', 'owner', 'published_at', 'status', 'tagged_with')
     list_filter = ('owner', 'categories', StatusListFilter)
+    search_fields = ('title', 'summary', 'body')
