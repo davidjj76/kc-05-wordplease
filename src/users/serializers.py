@@ -10,17 +10,17 @@ class BlogUrlField(serializers.HyperlinkedIdentityField):
         kwargs = { 'username': obj.get('username') }
         return reverse(view_name, kwargs=kwargs, request=request)
 
-class UsersListSerializer(serializers.ModelSerializer):
+class UsersListSerializer(serializers.Serializer):
 
-    blog_url = BlogUrlField(view_name='user_blog')
-
-    class Meta:
-        model = User
-        fields = ('username', 'blog_url')
+    id = serializers.ReadOnlyField()
+    username = serializers.CharField()
+    blog_url = BlogUrlField(view_name='user_blog', read_only=True)
 
 
-class UserSerializer(UsersListSerializer):
+class UserSerializer(serializers.Serializer):
 
+    id = serializers.ReadOnlyField()
+    username = serializers.CharField()
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
