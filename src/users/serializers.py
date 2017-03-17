@@ -1,12 +1,26 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.reverse import reverse
 
 
-class UserSerializer(serializers.Serializer):
+class BlogUrlField(serializers.HyperlinkedIdentityField):
 
-    id = serializers.ReadOnlyField()
-    username = serializers.CharField()
+    def get_url(self, obj, view_name, request, format):
+        kwargs = { 'username': obj.get('username') }
+        return reverse(view_name, kwargs=kwargs, request=request)
+
+class UsersListSerializer(serializers.ModelSerializer):
+
+    blog_url = BlogUrlField(view_name='user_blog')
+
+    class Meta:
+        model = User
+        fields = ('username', 'blog_url')
+
+
+class UserSerializer(UsersListSerializer):
+
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()

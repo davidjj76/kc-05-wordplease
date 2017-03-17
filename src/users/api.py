@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UsersListSerializer
 
 
 class UsersAPI(APIView):
@@ -15,8 +15,13 @@ class UsersAPI(APIView):
         :param request: HttpRequest object
         :return: HttpResponse object
         """
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
+        username = request.query_params.get('username', '')
+        order = request.query_params.get('order', '')
+        order_by = '-username' if order == 'des' else 'username'
+        users = User.objects.all().values('id', 'username')\
+            .filter(username__startswith=username)\
+            .order_by(order_by)
+        serializer = UsersListSerializer(users, many=True, context= { 'request': request })
         return Response(serializer.data)
 
     def post(self, request):
