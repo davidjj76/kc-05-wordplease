@@ -3,7 +3,7 @@
     Wordplease - {{ post.title }}
 {% endblock %}
 {% block content %}
-    <h2><a href="{% url 'user_blog' post.blog.author %}" title="Go to {{ post.blog.author }}'s blog">{{ post.blog.title | upper }}</a></h2>
+    <h2><a href="{% url 'user_blog' post.author %}" title="Go to {{ post.author }}'s blog">{{ post.author | upper }}'S BLOG</a></h2>
     <h3>{{ post.title }}</h3>
     {% if post.status == "Draft" %}
         <span><strong>Will published at:</strong> {{ post.published_at }} <em>({{ post.status }})</em></span>

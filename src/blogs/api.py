@@ -1,7 +1,8 @@
+from django.contrib.auth.models import User
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
-from blogs.models import Blog, Post
+from blogs.models import Post
 from blogs.serializers import BlogsListSerializer, PostsListSerializer, PostSerializer
 
 
@@ -11,10 +12,9 @@ class BlogsAPI(ListAPIView):
     """
     serializer_class = BlogsListSerializer
     filter_backends = (SearchFilter, OrderingFilter)
-    search_fields = ('author__username', 'title')
-    ordering_fields = ('author__username', 'title')
-    queryset = Blog.objects.all().select_related('author_username')\
-            .values('id', 'title', 'author__username')
+    search_fields = ('username', 'title')
+    ordering_fields = ('username', 'title')
+    queryset = User.objects.all().values('id', 'username')
 
 
 class PostsAPI(ListCreateAPIView):
@@ -27,7 +27,7 @@ class PostsAPI(ListCreateAPIView):
         return PostsListSerializer if self.request.method == 'GET' else PostSerializer
 
     def perform_create(self, serializer):
-        serializer.save(blog=self.request.user.blog)
+        serializer.save(author=self.request.user)
 
 class PostDetailAPI(RetrieveUpdateDestroyAPIView):
     """
@@ -37,4 +37,4 @@ class PostDetailAPI(RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
 
     def perform_update(self, serializer):
-        serializer.save(blog=self.request.user.blog)
+        serializer.save(author=self.request.user)

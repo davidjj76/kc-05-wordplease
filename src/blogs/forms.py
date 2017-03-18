@@ -1,16 +1,6 @@
 from django import forms
 
-from blogs.models import Blog, Post
-
-
-class BlogForm(forms.ModelForm):
-
-    class Meta:
-        model = Blog
-        fields = ['title']
-        labels = {
-            'title': 'Blog title'
-        }
+from blogs.models import Post
 
 
 class PostForm(forms.ModelForm):

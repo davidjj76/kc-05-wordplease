@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %} Wordplease - New post {% endblock %}
 {% block content %}
-    <h2><a href="{% url 'user_blog' blog.author %}" title="Go to {{ blog.author }}'s blog">{{ blog.title | upper }}</a></h2>
+    <h2><a href="{% url 'user_blog' blog %}" title="Go to {{ blog }}'s blog">{{ blog | upper }}'S BLOG</a></h2>
     <h3>NEW POST</h3>
 
     <div style="color:red">{{ error }}</div>

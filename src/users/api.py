@@ -4,8 +4,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
-from blogs.models import Blog
-from blogs.serializers import BlogSerializer
 from users.permissions import UserPermission
 from users.serializers import UserSerializer
 
@@ -20,22 +18,19 @@ class UsersAPI(APIView):
         :return: HttpResponse object
         """
         user_serializer = UserSerializer(data=request.data)
-        blog_serializer = BlogSerializer(data=request.data)
         if user_serializer.is_valid() and blog_serializer.is_valid():
             username = user_serializer.data.get('username')
             password = user_serializer.data.get('password')
             email = user_serializer.data.get('email')
             first_name = user_serializer.data.get('first_name')
             last_name = user_serializer.data.get('last_name')
-            blog_title = blog_serializer.data.get('title')
 
             User.objects.create_user(
                 username=username,
                 password=password,
                 email=email,
                 first_name=first_name,
-                last_name=last_name,
-                blog=Blog(title=blog_title)
+                last_name=last_name
             )
             return Response(user_serializer.data, status=status.HTTP_201_CREATED)
         else:

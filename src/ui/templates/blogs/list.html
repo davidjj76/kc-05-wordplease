@@ -15,16 +15,16 @@
             {% for blog in blogs %}
                 <tr>
                     <td>
-                        <a href="{% url 'user_blog' blog.author %}" title="Go to {{ blog.author }}'s blog">{{ blog.title }}</a>
+                        <a href="{% url 'user_blog' blog.username %}" title="Go to {{ blog.username }}'s blog">{{ blog.username }}'s blog</a>
                     </td>
                     <td>
-                        <em>{{ blog.author }}</em>
+                        <em>{{ blog.username }}</em>
                     </td>
                     <td>
-                        {{ blog.author.first_name }} {{ blog.author.last_name }}
+                        {{ blog.first_name }} {{ blog.last_name }}
                     </td>
                     <td>
-                        {{ blog.author.email }}
+                        {{ blog.email }}
                     </td>
                 </tr>
             {% endfor %}

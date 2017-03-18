@@ -1,6 +1,7 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from blogs.models import Blog, Post
+from blogs.models import Post
 from rest_framework.reverse import reverse
 
 from users.serializers import UserSerializer
@@ -17,15 +18,9 @@ class BlogsListSerializer(serializers.ModelSerializer):
 
     blog_url = BlogUrlField(view_name='user_blog', read_only=True)
     class Meta:
-        model = Blog
+        model = User
         fields = ('id', 'title', 'blog_url')
 
-
-class BlogSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Blog
-        fields = ('title',)
 
 class PostsListSerializer(serializers.ModelSerializer):
 

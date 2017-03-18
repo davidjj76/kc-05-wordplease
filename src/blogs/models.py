@@ -20,20 +20,6 @@ class Category(models.Model):
         return self.name
 
 
-class Blog(models.Model):
-
-    author = models.OneToOneField(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.title
-
-@receiver(post_save, sender=User)
-def create_user_blog(sender, instance, created, **kwargs):
-    if created:
-        Blog.objects.create(author=instance, title=instance.blog.title)
-
-
 class Post(models.Model):
 
     title = models.CharField(max_length=100)
@@ -43,7 +29,7 @@ class Post(models.Model):
     published_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     categories = models.ManyToManyField(Category)
 
     class Meta:
