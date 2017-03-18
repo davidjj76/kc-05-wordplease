@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}
     Wordplease -
-    {% if username %}
-        {{ username }}'s blog
+    {% if blog %}
+        {{ blog.title }}
     {% else %}
         Latest posts
     {% endif %}
 {% endblock %}
 {% block content %}
-    {% if username %}
-        <h2>{{ username | upper }}'S BLOG</h2>
+    {% if blog %}
+        <h2>{{ blog.title | upper }}</h2>
     {% else %}
         <h2>LATEST POSTS</h2>
     {% endif %}
@@ -28,10 +28,10 @@
             {% for post in posts %}
                 <tr>
                     <td>
-                        <a href="{% url 'user_blog' post.owner.username %}" title="Go to {{ post.owner.username }}'s blog">{{ post.owner.username }}'s blog</a>
+                        <a href="{% url 'user_blog' post.blog.author %}" title="Go to {{ post.blog.author }}'s blog">{{ post.blog.title }}</a>
                     </td>
                     <td>
-                        <a href="{% url 'post_detail' post.owner.username post.id %}" title="Read more...">{{ post.title }}</a>
+                        <a href="{% url 'post_detail' post.blog.author post.id %}" title="Read more...">{{ post.title }}</a>
                     </td>
                     <td>
                         {% if post.media_url %}

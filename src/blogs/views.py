@@ -1,8 +1,7 @@
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import render, get_list_or_404, redirect
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -10,7 +9,7 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 
 from blogs.forms import PostForm
-from blogs.models import Post
+from blogs.models import Blog, Post
 
 
 def published_posts(user):
@@ -21,7 +20,7 @@ def published_posts(user):
     if user.is_authenticated():
         if not user.is_superuser:
             # Can see his posts and published posts from other users (published before now)
-            return (Q(owner__username=user.username) | Q(published_at__lte=timezone.now()))
+            return (Q(blog__author__username=user.username) | Q(published_at__lte=timezone.now()))
     else:
         # Only can see published posts (published before now)
         return (Q(published_at__lte=timezone.now()))
@@ -44,7 +43,7 @@ class BlogsView(ListView):
 
     template_name = 'blogs/list.html'
     context_object_name = 'blogs'
-    queryset = User.objects.select_related()
+    queryset = Blog.objects.select_related()
 
 
 class UserBlogView(ListView):
@@ -53,12 +52,13 @@ class UserBlogView(ListView):
 
     def get_queryset(self):
         return Post.objects.select_related()\
-            .filter(owner__username=self.kwargs.get('username'))\
+            .filter(blog__author__username=self.kwargs.get('username'))\
             .filter(published_posts(self.request.user))
 
     def get_context_data(self, **kwargs):
         context = super(UserBlogView, self).get_context_data(**kwargs)
-        context['username'] = self.kwargs.get('username')
+        if len(self.object_list):
+            context['blog'] = self.object_list[0].blog
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -66,7 +66,8 @@ class UserBlogView(ListView):
             if self.request.user.username == self.kwargs.get('username'):
                 return redirect('new_post')
             else:
-                raise Http404("No blog/posts found.")
+                raise Http404("No blog / posts found.")
+
         return render(self.request, 'blogs/index.html', context)
 
 
@@ -74,7 +75,7 @@ class PostDetailView(DetailView):
 
     def get_queryset(self):
         return Post.objects.select_related() \
-            .filter(owner__username=self.kwargs.get('username')) \
+            .filter(blog__author__username=self.kwargs.get('username')) \
             .filter(id=self.kwargs.get('pk')) \
             .filter(published_posts(self.request.user))
 
@@ -94,8 +95,17 @@ class NewPostView(View):
         :param request: HttpRequest object
         :return:  HttpResponse object
         """
-        form = PostForm()
-        return render(request, 'blogs/new_post.html', { 'form': form })
+        try:
+            blog = request.user.blog
+            form = PostForm()
+            context = {
+                'blog': blog,
+                'form': form
+            }
+            return render(request, 'blogs/new_post.html', context)
+
+        except Blog.DoesNotExist:
+            raise Http404("No blog found.")
 
     @method_decorator(login_required(login_url='/login/'))
     def post(self, request):
@@ -104,16 +114,21 @@ class NewPostView(View):
         :param request: HttpRequest object
         :return:  HttpResponse object
         """
-        new_post = Post(owner=request.user)
-        form = PostForm(request.POST, instance=new_post)
-        context = dict()
+        try:
+            new_post = Post(blog=request.user.blog)
+            form = PostForm(request.POST, instance=new_post)
+            context = dict()
 
-        if form.is_valid():
-            post = form.save()
-            # Redirect to post detail
-            return redirect('post_detail', username=post.owner.username, pk=post.pk)
-        else:
-            context['error'] = "Error submitting new post"
+            if form.is_valid():
+                post = form.save()
+                # Redirect to post detail
+                return redirect('post_detail', username=post.blog.author, pk=post.pk)
+            else:
+                context['error'] = "Error submitting new post"
 
-        context['form'] = form
-        return render(request, 'blogs/new_post.html', context)
+            context['form'] = form
+            return render(request, 'blogs/new_post.html', context)
+
+        except Blog.DoesNotExist:
+            raise Http404("No blog found.")
+

@@ -5,26 +5,26 @@
     <table width="100%" border="1" cellpadding="10" cellspacing="0">
         <thead>
             <tr>
+                <th>Blog</th>
                 <th>Owner</th>
                 <th>Full name</th>
                 <th>Email</th>
-                <th>Blog</th>
             </tr>
         </thead>
         <tbody>
             {% for blog in blogs %}
                 <tr>
                     <td>
-                        <em>{{ blog.username }}</em>
+                        <a href="{% url 'user_blog' blog.author %}" title="Go to {{ blog.author }}'s blog">{{ blog.title }}</a>
                     </td>
                     <td>
-                        {{ blog.first_name }} {{ blog.last_name }}
+                        <em>{{ blog.author }}</em>
                     </td>
                     <td>
-                        {{ blog.email }}
+                        {{ blog.author.first_name }} {{ blog.author.last_name }}
                     </td>
                     <td>
-                        <a href="{% url 'user_blog' blog.username %}" title="Go to {{ blog.username }}'s blog">{{ blog.username }}'s blog</a>
+                        {{ blog.author.email }}
                     </td>
                 </tr>
             {% endfor %}

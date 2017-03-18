@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 
 
@@ -18,6 +20,19 @@ class Category(models.Model):
         return self.name
 
 
+class Blog(models.Model):
+
+    author = models.OneToOneField(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Blog.objects.create(author=instance, title=instance.blog.title)
+
 class Post(models.Model):
 
     title = models.CharField(max_length=100)
@@ -27,7 +42,7 @@ class Post(models.Model):
     published_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     categories = models.ManyToManyField(Category)
 
     class Meta:
