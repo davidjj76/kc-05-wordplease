@@ -4,6 +4,15 @@ from rest_framework import serializers
 from blogs.models import Post
 from rest_framework.reverse import reverse
 
+from users.serializers import UserNameSerializer
+
+
+class CategorySerializer(serializers.Serializer):
+
+    id = serializers.ReadOnlyField()
+    abbreviation = serializers.CharField()
+    name = serializers.CharField()
+
 
 class BlogUrlField(serializers.HyperlinkedIdentityField):
 
@@ -28,3 +37,14 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = "__all__"
         read_only_fields = ('author',)
+
+class PostReadSerializer(PostSerializer):
+
+    author = UserNameSerializer()
+    categories = CategorySerializer(many=True)
+
+class PostListSerializer(PostReadSerializer):
+
+    class Meta:
+        model = Post
+        fields = ('id', 'author', 'title', 'media_url', 'summary', 'published_at')

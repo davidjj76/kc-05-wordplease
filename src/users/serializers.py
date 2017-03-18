@@ -3,13 +3,17 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 
-class UserSerializer(serializers.Serializer):
+class UserNameSerializer(serializers.Serializer):
 
     id = serializers.ReadOnlyField()
-    username = serializers.CharField()
-    email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+
+
+class UserSerializer(UserNameSerializer):
+
+    username = serializers.CharField()
+    email = serializers.EmailField()
     password = serializers.CharField()
 
     def create(self, validated_data):
