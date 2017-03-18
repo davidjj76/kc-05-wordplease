@@ -4,8 +4,6 @@ from rest_framework import serializers
 from blogs.models import Post
 from rest_framework.reverse import reverse
 
-from users.serializers import UserSerializer
-
 
 class BlogUrlField(serializers.HyperlinkedIdentityField):
 
@@ -17,16 +15,11 @@ class BlogUrlField(serializers.HyperlinkedIdentityField):
 class BlogsListSerializer(serializers.ModelSerializer):
 
     blog_url = BlogUrlField(view_name='user_blog', read_only=True)
+    posts = serializers.IntegerField()
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'blog_url')
-
-
-class PostsListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Post
-        fields = ('id', 'title', 'summary', 'media_url', 'published_at')
+        fields = ('id', 'username', 'blog_url', 'posts')
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -34,4 +27,4 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = "__all__"
-        read_only_fields = ("blog",)
+        read_only_fields = ('author',)

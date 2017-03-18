@@ -1,9 +1,12 @@
 from django.contrib.auth.models import User
+from django.db.models import Count
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from blogs.models import Post
-from blogs.serializers import BlogsListSerializer, PostsListSerializer, PostSerializer
+from blogs.permissions import PostPermission
+from blogs.serializers import BlogsListSerializer, PostSerializer
 
 
 class BlogsAPI(ListAPIView):
@@ -14,17 +17,17 @@ class BlogsAPI(ListAPIView):
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('username',)
     ordering_fields = ('username',)
-    queryset = User.objects.all().values('id', 'username')
+    queryset = User.objects.annotate(posts=Count('post'))\
+        .values('id', 'username', 'posts')
 
 
-class PostsAPI(ListCreateAPIView):
+class PostsAPI(CreateAPIView):
     """
-    Lists (GET) and create (POST) posts
+    Create (POST) posts
     """
     queryset = Post.objects.all().select_related()
-
-    def get_serializer_class(self):
-        return PostsListSerializer if self.request.method == 'GET' else PostSerializer
+    serializer_class = PostSerializer
+    permission_classes = (IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -35,6 +38,7 @@ class PostDetailAPI(RetrieveUpdateDestroyAPIView):
     """
     queryset = Post.objects.all().select_related()
     serializer_class = PostSerializer
+    permission_classes = (PostPermission,)
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
