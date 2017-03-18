@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from blogs.api import PostsAPI, PostDetailAPI, BlogsAPI
+from blogs.api import BlogsAPI, PostsAPI, PostDetailAPI
 from blogs.views import LatestPostsView, BlogsView, UserBlogView, PostDetailView, NewPostView
 from users.api import UsersAPI, UserDetailAPI
 from users.views import LoginView, SignupView, logout
