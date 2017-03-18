@@ -29,9 +29,10 @@ class Blog(models.Model):
         return self.title
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_user_blog(sender, instance, created, **kwargs):
     if created:
         Blog.objects.create(author=instance, title=instance.blog.title)
+
 
 class Post(models.Model):
 

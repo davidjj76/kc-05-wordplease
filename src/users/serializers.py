@@ -1,20 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.reverse import reverse
-
-
-class BlogUrlField(serializers.HyperlinkedIdentityField):
-
-    def get_url(self, obj, view_name, request, format):
-        kwargs = { 'username': obj.get('username') }
-        return reverse(view_name, kwargs=kwargs, request=request)
-
-class UsersListSerializer(serializers.Serializer):
-
-    id = serializers.ReadOnlyField()
-    username = serializers.CharField()
-    blog_url = BlogUrlField(view_name='user_blog', read_only=True)
 
 
 class UserSerializer(serializers.Serializer):
@@ -64,4 +50,3 @@ class UserSerializer(serializers.Serializer):
             raise ValidationError('Email already exists')
 
         return email
-

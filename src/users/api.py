@@ -4,26 +4,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
+from blogs.models import Blog
+from blogs.serializers import BlogSerializer
 from users.permissions import UserPermission
-from users.serializers import UserSerializer, UsersListSerializer
+from users.serializers import UserSerializer
 
 
 class UsersAPI(APIView):
 
-    def get(self, request):
-        """
-        Returns a list of system users
-        :param request: HttpRequest object
-        :return: HttpResponse object
-        """
-        username = request.query_params.get('username', '')
-        order = request.query_params.get('order', '')
-        order_by = '-username' if order == 'des' else 'username'
-        users = User.objects.all().values('id', 'username')\
-            .filter(username__startswith=username)\
-            .order_by(order_by)
-        serializer = UsersListSerializer(users, many=True, context={ 'request': request })
-        return Response(serializer.data)
 
     def post(self, request):
         """
@@ -31,12 +19,27 @@ class UsersAPI(APIView):
         :param request: HttpRequest object
         :return: HttpResponse object
         """
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        user_serializer = UserSerializer(data=request.data)
+        blog_serializer = BlogSerializer(data=request.data)
+        if user_serializer.is_valid() and blog_serializer.is_valid():
+            username = user_serializer.data.get('username')
+            password = user_serializer.data.get('password')
+            email = user_serializer.data.get('email')
+            first_name = user_serializer.data.get('first_name')
+            last_name = user_serializer.data.get('last_name')
+            blog_title = blog_serializer.data.get('title')
+
+            User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                blog=Blog(title=blog_title)
+            )
+            return Response(user_serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailAPI(APIView):
