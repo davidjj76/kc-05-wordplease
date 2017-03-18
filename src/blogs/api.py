@@ -1,3 +1,4 @@
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from blogs.models import Blog, Post
@@ -9,15 +10,11 @@ class BlogsAPI(ListAPIView):
     Lists (GET) blogs
     """
     serializer_class = BlogsListSerializer
-
-    def get_queryset(self):
-        username = self.request.query_params.get('username', '')
-        order = self.request.query_params.get('order', '')
-        order_by = '-author__username' if order == 'des' else 'author__username'
-        return Blog.objects.all().select_related('author_username')\
-            .values('id', 'title', 'author__username')\
-            .filter(author__username__startswith=username)\
-            .order_by(order_by)
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('author__username', 'title')
+    ordering_fields = ('author__username', 'title')
+    queryset = Blog.objects.all().select_related('author_username')\
+            .values('id', 'title', 'author__username')
 
 
 class PostsAPI(ListCreateAPIView):
@@ -38,3 +35,6 @@ class PostDetailAPI(RetrieveUpdateDestroyAPIView):
     """
     queryset = Post.objects.all().select_related()
     serializer_class = PostSerializer
+
+    def perform_update(self, serializer):
+        serializer.save(blog=self.request.user.blog)
