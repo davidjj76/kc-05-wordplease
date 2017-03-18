@@ -10,31 +10,18 @@ from users.serializers import UserSerializer
 
 class UsersAPI(APIView):
 
-
     def post(self, request):
         """
         Creates a user
         :param request: HttpRequest object
         :return: HttpResponse object
         """
-        user_serializer = UserSerializer(data=request.data)
-        if user_serializer.is_valid() and blog_serializer.is_valid():
-            username = user_serializer.data.get('username')
-            password = user_serializer.data.get('password')
-            email = user_serializer.data.get('email')
-            first_name = user_serializer.data.get('first_name')
-            last_name = user_serializer.data.get('last_name')
-
-            User.objects.create_user(
-                username=username,
-                password=password,
-                email=email,
-                first_name=first_name,
-                last_name=last_name
-            )
-            return Response(user_serializer.data, status=status.HTTP_201_CREATED)
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailAPI(APIView):
